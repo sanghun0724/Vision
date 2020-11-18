@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="b1r-th-9sS">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Text Detection-->
+        <scene sceneID="Rm7-rc-TeY">
+            <objects>
+                <viewController id="orW-fo-3gF" customClass="ViewController" customModule="Text_Detection_Starter_Project" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="xgD-zk-noa"/>
+                        <viewControllerLayoutGuide type="bottom" id="hED-ek-FP3"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="QUd-3s-dLE">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5FK-Vm-KhL">
+                                <rect key="frame" x="0.0" y="88" width="414" height="713"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uFm-uK-MLO">
+                                <rect key="frame" x="0.0" y="809" width="414" height="53"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="에이브레인 APPScanner">
+                                        <attributes>
+                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <font key="NSFont" size="22" name="AppleSDGothicNeo-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="o0S-6U-AG6"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="hED-ek-FP3" firstAttribute="top" secondItem="uFm-uK-MLO" secondAttribute="bottom" id="1Io-FV-ISs"/>
+                            <constraint firstItem="uFm-uK-MLO" firstAttribute="top" secondItem="5FK-Vm-KhL" secondAttribute="bottom" constant="8" id="93g-cr-0hu"/>
+                            <constraint firstAttribute="trailing" secondItem="uFm-uK-MLO" secondAttribute="trailing" id="JnQ-Le-ays"/>
+                            <constraint firstItem="5FK-Vm-KhL" firstAttribute="top" secondItem="xgD-zk-noa" secondAttribute="bottom" id="LFU-AZ-2Nu"/>
+                            <constraint firstItem="uFm-uK-MLO" firstAttribute="leading" secondItem="QUd-3s-dLE" secondAttribute="leading" id="exW-Gm-Eq0"/>
+                            <constraint firstItem="uFm-uK-MLO" firstAttribute="top" secondItem="5FK-Vm-KhL" secondAttribute="bottom" constant="8" id="fDx-wE-vND"/>
+                            <constraint firstAttribute="trailing" secondItem="5FK-Vm-KhL" secondAttribute="trailing" id="kOB-bT-sGK"/>
+                            <constraint firstItem="5FK-Vm-KhL" firstAttribute="leading" secondItem="QUd-3s-dLE" secondAttribute="leading" id="khW-Bv-I8s"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Text Detection" largeTitleDisplayMode="always" id="pDY-2r-Lsq"/>
+                    <connections>
+                        <outlet property="imageView" destination="5FK-Vm-KhL" id="30P-W5-smC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rbj-1j-0xO" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2163.768115942029" y="138.61607142857142"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="n8C-bd-Tyo">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="b1r-th-9sS" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="CqR-la-yjA">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="orW-fo-3gF" kind="relationship" relationship="rootViewController" id="q9d-cZ-QMx"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c8F-Jh-HR4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1253.6231884057972" y="138.61607142857142"/>
+        </scene>
+    </scenes>
+</document>
