@@ -88,6 +88,7 @@ class ViewController: UIViewController {
             }
         }
     }
+    
     //박스조정
     func highlightWord(box: VNTextObservation) {
         guard let boxes = box.characterBoxes else {

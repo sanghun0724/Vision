@@ -7,10 +7,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Text Detection-->
+        <!--에이브레인-이상헌-->
         <scene sceneID="Rm7-rc-TeY">
             <objects>
-                <viewController id="orW-fo-3gF" customClass="ViewController" customModule="Text_Detection_Starter_Project" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="orW-fo-3gF" customClass="ViewController" customModule="AppScanner" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="xgD-zk-noa"/>
                         <viewControllerLayoutGuide type="bottom" id="hED-ek-FP3"/>
@@ -49,7 +49,7 @@
                             <constraint firstItem="5FK-Vm-KhL" firstAttribute="leading" secondItem="QUd-3s-dLE" secondAttribute="leading" id="khW-Bv-I8s"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Text Detection" largeTitleDisplayMode="always" id="pDY-2r-Lsq"/>
+                    <navigationItem key="navigationItem" title="에이브레인-이상헌" largeTitleDisplayMode="always" id="pDY-2r-Lsq"/>
                     <connections>
                         <outlet property="imageView" destination="5FK-Vm-KhL" id="30P-W5-smC"/>
                     </connections>
