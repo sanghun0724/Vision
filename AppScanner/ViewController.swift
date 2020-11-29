@@ -11,6 +11,7 @@ import VisionKit
 
 class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
 
+    @IBOutlet weak var readiousButtonView:UIView!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var textView: UITextView!
     
@@ -19,6 +20,11 @@ class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        readiousButtonView.clipsToBounds = true
+        readiousButtonView.layer.cornerRadius = readiousButtonView.frame.size.width/2
+        self.textView.layer.shadowRadius = 4
+        self.textView.layer.shadowOpacity = 0.7
+        self.textView.layer.shadowOffset = CGSize(width: 0, height: 4)
         textView.isEditable = false
         setupVision()
     }
