@@ -6,162 +6,102 @@
 //
 
 import UIKit
-import AVFoundation
 import Vision
+import VisionKit
 
-class ViewController: UIViewController {
-    
+class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
+
     @IBOutlet weak var imageView: UIImageView!
-    var session = AVCaptureSession()
-    var requests = [VNRequest]()
+    @IBOutlet weak var textView: UITextView!
+    
+    var textRecognitionRequest = VNRecognizeTextRequest(completionHandler: nil)
+    private let textRecognitionWorkQueue = DispatchQueue(label: "MyVisionScannerQueue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem)
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        textView.isEditable = false
+        setupVision()
+    }
+
+    @IBAction func btnTakePicture(_ sender: Any) {
         
-        startLiveVideo()
-        startTextDetection()
+        let scannerViewController = VNDocumentCameraViewController()
+        scannerViewController.delegate = self
+        present(scannerViewController, animated: true)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        
+    private func setupVision() {
+        textRecognitionRequest = VNRecognizeTextRequest { (request, error) in
+            guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
+            
+            var detectedText = ""
+            for observation in observations {
+                guard let topCandidate = observation.topCandidates(1).first else { return }
+                print("text \(topCandidate.string) has confidence \(topCandidate.confidence)")
+    
+                detectedText += topCandidate.string
+                detectedText += "\n"
+                
+            
+            }
+            
+            DispatchQueue.main.async {
+                self.textView.text = detectedText
+                self.textView.flashScrollIndicators()
+
+            }
+        }
+
+        textRecognitionRequest.recognitionLevel = .accurate
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    private func processImage(_ image: UIImage) {
+        imageView.image = image
+        recognizeTextInImage(image)
     }
     
-    //카메라 허용받고 시작
-    func startLiveVideo() {
-        //1
-        session.sessionPreset = AVCaptureSession.Preset.photo
-        let captureDevice = AVCaptureDevice.default(for: AVMediaType.video)
+    private func recognizeTextInImage(_ image: UIImage) {
+        guard let cgImage = image.cgImage else { return }
         
-        //2
-        let deviceInput = try! AVCaptureDeviceInput(device: captureDevice!)
-        let deviceOutput = AVCaptureVideoDataOutput()
-        deviceOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
-        deviceOutput.setSampleBufferDelegate(self, queue: DispatchQueue.global(qos: DispatchQoS.QoSClass.default))
-        session.addInput(deviceInput)
-        session.addOutput(deviceOutput)
-        
-        //3
-        let imageLayer = AVCaptureVideoPreviewLayer(session: session)
-        imageLayer.frame = imageView.bounds
-        imageView.layer.addSublayer(imageLayer)
-        
-        session.startRunning()
+        textView.text = ""
+        textRecognitionWorkQueue.async {
+            let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            do {
+                try requestHandler.perform([self.textRecognitionRequest])
+            } catch {
+                print(error)
+            }
+        }
     }
     
-    override func viewDidLayoutSubviews() {
-        imageView.layer.sublayers?[0].frame = imageView.bounds
-    }
-    //탐색 시작
-    func startTextDetection() {
-        let textRequest = VNDetectTextRectanglesRequest(completionHandler: self.detectTextHandler)
-        textRequest.reportCharacterBoxes = true
-        self.requests = [textRequest]
-    }
-    
-    //텍스트찾기
-    func detectTextHandler(request: VNRequest, error: Error?) {
-        guard let observations = request.results else {
-            print("no result")
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+        guard scan.pageCount >= 1 else {
+            controller.dismiss(animated: true)
             return
         }
         
-        let result = observations.map({$0 as? VNTextObservation})
+        let originalImage = scan.imageOfPage(at: 0)
+        let newImage = compressedImage(originalImage)
+        controller.dismiss(animated: true)
         
-        DispatchQueue.main.async() {
-            self.imageView.layer.sublayers?.removeSubrange(1...)
-            for region in result {
-                guard let rg = region else {
-                    continue
-                }
-                
-                self.highlightWord(box: rg)
-                
-                if let boxes = region?.characterBoxes {
-                    for characterBox in boxes {
-                        self.highlightLetters(box: characterBox)
-                    }
-                }
-            }
-        }
+        processImage(newImage)
     }
     
-    //박스조정
-    func highlightWord(box: VNTextObservation) {
-        guard let boxes = box.characterBoxes else {
-            return
-        }
-        
-        var maxX: CGFloat = 9999.0
-        var minX: CGFloat = 0.0
-        var maxY: CGFloat = 9999.0
-        var minY: CGFloat = 0.0
-        
-        for char in boxes {
-            if char.bottomLeft.x < maxX {
-                maxX = char.bottomLeft.x
-            }
-            if char.bottomRight.x > minX {
-                minX = char.bottomRight.x
-            }
-            if char.bottomRight.y < maxY {
-                maxY = char.bottomRight.y
-            }
-            if char.topRight.y > minY {
-                minY = char.topRight.y
-            }
-        }
-        
-        let xCord = maxX * imageView.frame.size.width
-        let yCord = (1 - minY) * imageView.frame.size.height
-        let width = (minX - maxX) * imageView.frame.size.width
-        let height = (minY - maxY) * imageView.frame.size.height
-        
-        let outline = CALayer()
-        outline.frame = CGRect(x: xCord, y: yCord, width: width, height: height)
-        outline.borderWidth = 2.0
-        outline.borderColor = UIColor.red.cgColor
-        
-        imageView.layer.addSublayer(outline)
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        print(error)
+        controller.dismiss(animated: true)
     }
     
-    func highlightLetters(box: VNRectangleObservation) {
-        let xCord = box.topLeft.x * imageView.frame.size.width
-        let yCord = (1 - box.topLeft.y) * imageView.frame.size.height
-        let width = (box.topRight.x - box.bottomLeft.x) * imageView.frame.size.width
-        let height = (box.topLeft.y - box.bottomLeft.y) * imageView.frame.size.height
-        
-        let outline = CALayer()
-        outline.frame = CGRect(x: xCord, y: yCord, width: width, height: height)
-        outline.borderWidth = 1.0
-        outline.borderColor = UIColor.blue.cgColor
-        
-        imageView.layer.addSublayer(outline)
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        controller.dismiss(animated: true)
+    }
+
+    func compressedImage(_ originalImage: UIImage) -> UIImage {
+        guard let imageData = originalImage.jpegData(compressionQuality: 1),
+            let reloadedImage = UIImage(data: imageData) else {
+                return originalImage
+        }
+        return reloadedImage
     }
 }
 
-//비디오 데이터 요청
-extension ViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
-            return
-        }
-        
-        var requestOptions:[VNImageOption : Any] = [:]
-        
-        if let camData = CMGetAttachment(sampleBuffer, key: kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, attachmentModeOut: nil) {
-            requestOptions = [.cameraIntrinsics:camData]
-        }
-        
-        let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: CGImagePropertyOrientation(rawValue: 6)!, options: requestOptions)
-        
-        do {
-            try imageRequestHandler.perform(self.requests)
-        } catch {
-            print(error)
-        }
-    }
-}
