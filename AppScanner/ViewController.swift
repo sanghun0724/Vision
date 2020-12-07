@@ -28,7 +28,9 @@ class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
         textView.isEditable = false
         setupVision()
     }
-
+    
+    //MARK: Action
+    //사진촬영
     @IBAction func btnTakePicture(_ sender: Any) {
         
         let scannerViewController = VNDocumentCameraViewController()
@@ -36,6 +38,7 @@ class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
         present(scannerViewController, animated: true)
     }
     
+    //Setting
     private func setupVision() {
         textRecognitionRequest = VNRecognizeTextRequest { (request, error) in
             guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
@@ -80,6 +83,8 @@ class ViewController: UIViewController, VNDocumentCameraViewControllerDelegate {
         }
     }
     
+    //MARK: Document
+    //카메라가 인지하는부분 보여주는 Method
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
         guard scan.pageCount >= 1 else {
             controller.dismiss(animated: true)
